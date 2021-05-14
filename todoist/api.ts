@@ -1,4 +1,4 @@
-type Resource = Record<string, unknown>
+type Resource = Record<string, unknown>;
 
 interface BodyParams {
   syncToken?: string;
@@ -6,14 +6,14 @@ interface BodyParams {
 }
 
 interface SyncResult {
-  [resourceType: string]: Resource[] | undefined
+  [resourceType: string]: Resource[] | undefined;
 }
 
 /**
  * See https://developer.todoist.com/sync/v8/
  */
 export class Todoist {
-  private readonly baseUrl = 'https://api.todoist.com/sync/v8/sync';
+  private readonly baseUrl = "https://api.todoist.com/sync/v8/sync";
 
   constructor(
     private token: string,
@@ -23,7 +23,7 @@ export class Todoist {
   public async getTasks(): Promise<Resource[] | undefined> {
     const result = await this.sync({
       resourceTypes: ["items"],
-    })
+    });
     return result["items"];
   }
 
@@ -31,9 +31,9 @@ export class Todoist {
     const body = this.buildBody(params);
     const response = await fetch(this.baseUrl, {
       body,
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Accept': 'application/json',
+        "Accept": "application/json",
       },
     });
     const result: SyncResult = await response.json();
@@ -42,11 +42,11 @@ export class Todoist {
 
   private buildBody(params: BodyParams) {
     const data = new URLSearchParams();
-    data.append('token', this.token);
+    data.append("token", this.token);
     if (params.resourceTypes) {
-      data.append('resource_types', JSON.stringify(params.resourceTypes))
+      data.append("resource_types", JSON.stringify(params.resourceTypes));
     }
-    data.append('sync_token', params.syncToken ?? '*');
+    data.append("sync_token", params.syncToken ?? "*");
     return data;
   }
 }

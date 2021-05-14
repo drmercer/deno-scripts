@@ -7,10 +7,10 @@ Deno is great. :heart:
 Example:
 
 ```typescript
-import { Todoist } from 'https://danmercer.net/deno/todoist/api.ts';
+import { Todoist } from "https://danmercer.net/deno/todoist/api.ts";
 
-const td = new Todoist('<YOUR API TOKEN>');
+const td = new Todoist("<YOUR API TOKEN>");
 let tasks = await td.getTasks();
 
-console.log(tasks?.length + ' tasks found');
+console.log(tasks?.length + " tasks found");
 ```
