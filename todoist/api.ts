@@ -1,4 +1,4 @@
-export type Resource = Record<string, unknown>;
+import { Project, Task } from "./types.ts";
 
 export interface BodyParams {
   syncToken?: string;
@@ -8,8 +8,8 @@ export interface BodyParams {
 export interface SyncResult {
   success: true;
   sync_token: string;
-  items: Resource[] | undefined;
-  projects: Resource[] | undefined;
+  items: Task[] | undefined;
+  projects: Project[] | undefined;
   // TODO add other resource types
 }
 
