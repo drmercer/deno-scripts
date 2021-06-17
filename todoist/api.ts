@@ -1,52 +1,62 @@
-type Resource = Record<string, unknown>;
+export type Resource = Record<string, unknown>;
 
-interface BodyParams {
+export interface BodyParams {
   syncToken?: string;
   resourceTypes?: string[];
 }
 
-interface SyncResult {
-  [resourceType: string]: Resource[] | undefined;
+export interface SyncResult {
+  success: true;
+  sync_token: string;
+  items: Resource[] | undefined;
+  projects: Resource[] | undefined;
+  // TODO add other resource types
+}
+
+export interface ErrorResult {
+  success: false;
+  error: string;
+  error_code: number;
+}
+
+const baseUrl = "https://api.todoist.com/sync/v8/sync";
+
+export interface TodoistApi {
+  sync(params: BodyParams): Promise<SyncResult | ErrorResult>
 }
 
 /**
  * See https://developer.todoist.com/sync/v8/
  */
-export class Todoist {
-  private readonly baseUrl = "https://api.todoist.com/sync/v8/sync";
+export function Todoist(token: string): TodoistApi {
 
-  constructor(
-    private token: string,
-  ) {
-  }
-
-  public async getTasks(): Promise<Resource[] | undefined> {
-    const result = await this.sync({
-      resourceTypes: ["items"],
-    });
-    return result["items"];
-  }
-
-  public async sync(params: BodyParams): Promise<SyncResult> {
-    const body = this.buildBody(params);
-    const response = await fetch(this.baseUrl, {
-      body,
-      method: "POST",
-      headers: {
-        "Accept": "application/json",
-      },
-    });
-    const result: SyncResult = await response.json();
-    return result;
-  }
-
-  private buildBody(params: BodyParams) {
+  function buildBody(params: BodyParams) {
     const data = new URLSearchParams();
-    data.append("token", this.token);
+    data.append("token", token);
     if (params.resourceTypes) {
       data.append("resource_types", JSON.stringify(params.resourceTypes));
     }
     data.append("sync_token", params.syncToken ?? "*");
     return data;
   }
+
+  async function sync(params: BodyParams): Promise<SyncResult|ErrorResult> {
+    const body = buildBody(params);
+    const response = await fetch(baseUrl, {
+      body,
+      method: "POST",
+      headers: {
+        "Accept": "application/json",
+      },
+    });
+    const result = await response.json();
+    return {
+      success: !('error' in result),
+      ...result,
+    };
+  }
+
+  return {
+    sync,
+  };
 }
