@@ -1,6 +1,7 @@
 import password from "../../io/password.ts";
 import { readState, writeState } from "./store.ts";
 import { doSync, SyncState } from "../sync.ts";
+import { Todoist } from "../api/api.ts";
 
 export function init() {
   const accessToken = password("Enter your Todoist API token: ");
@@ -31,6 +32,16 @@ export async function sync() {
   writeState(state);
 
   console.log("State saved:", summarizeState(state));
+}
+
+export async function add([task]: string[]) {
+  const accessToken = localStorage.getItem("todoist:token");
+  if (!accessToken) {
+    console.error("Run td init first to set your Todoist access token");
+    return;
+  }
+  const result = await Todoist(accessToken).quickAdd(task);
+  console.log(result);
 }
 
 export function status() {

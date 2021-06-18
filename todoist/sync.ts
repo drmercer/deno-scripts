@@ -1,5 +1,5 @@
 import { Project, Task } from './api/types.ts';
-import { SyncResult, Todoist } from './api/api.ts';
+import { SyncResponse, Todoist } from './api/api.ts';
 
 export interface SyncState {
   syncToken: string;
@@ -15,11 +15,11 @@ export async function doSync(accessToken: string, oldState?: SyncState): Promise
   if (!result.success) {
     throw new Error("Failed sync. " + JSON.stringify(result));
   }
-  const changes = resultToState(result);
+  const changes = resultToState(result.data);
   return oldState ? mergeState(oldState, changes) : changes;
 }
 
-export function resultToState(result: SyncResult): SyncState {
+export function resultToState(result: SyncResponse): SyncState {
   return {
     syncToken: result.sync_token,
     tasks: result.items ?? [],
