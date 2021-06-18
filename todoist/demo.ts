@@ -31,8 +31,7 @@ function inbox() {
     .filter(t => t.project_id === inboxProject?.id)
     .filter(t => !t.parent_id)
     .filter(t => t.due ? new Date(t.due.date) < eod : true)
-    .sort((a, b) => comparePriority(a, b) || compareDueDate(a, b) || compareCreatedDate(a, b))
-    .reverse()
+    .sort((a, b) => -comparePriority(a, b) || compareDueDate(a, b) || compareCreatedDate(a, b))
     .map(t => t.content + (t.due ? ` (${t.due.date}, ${t.due.string})` : ""))
 
   console.log(tasks)

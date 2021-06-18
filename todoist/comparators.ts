@@ -1,29 +1,25 @@
 import { Task } from "./api/types.ts";
+import { CompareFn, compareNumbers, map } from "https://danmercer.net/deno/common/sort/comparators.ts";
 
-export function comparePriority(a: Task, b: Task): number {
-  if (a.priority > b.priority) {
-    return 1;
-  } else if (a.priority < b.priority) {
-    return -1;
-  } else {
-    return 0;
-  }
-}
+export const comparePriority: CompareFn<Task> = map(
+  t => t.priority,
+  compareNumbers,
+);
 
-export function compareDueDate(a: Task, b: Task): number {
-  if (!b.due) {
-    return 1;
-  } else if (!a.due) {
-    return -1;
-  } else {
-    return new Date(a.due.date).getTime() - new Date(b.due.date).getTime();
-  }
-}
+/**
+ * Sorts by due date, puting tasks with no due date **last**.
+ */
+export const compareDueDate: CompareFn<Task> = map(
+  t => t.due ? new Date(t.due.date).getTime() : Number.POSITIVE_INFINITY,
+  compareNumbers,
+);
 
-export function compareCreatedDate(a: Task, b: Task): number {
-  return compareStringDates(a.date_added, b.date_added);
-}
+export const compareStringDates: CompareFn<string> = map(
+  s => new Date(s).getTime(),
+  compareNumbers,
+);
 
-export function compareStringDates(a: string, b: string): number {
-  return new Date(a).getTime() - new Date(b).getTime();
-}
+export const compareCreatedDate: CompareFn<Task> = map(
+  t => t.date_added,
+  compareStringDates,
+);
