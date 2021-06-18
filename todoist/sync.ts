@@ -27,16 +27,15 @@ export function resultToState(result: SyncResponse): SyncState {
   };
 }
 
-export function mergeState(oldState: SyncState, changes: SyncState): SyncState {
+export function mergeState(oldState: SyncState, changes: Partial<SyncState>): SyncState {
   return {
     syncToken: changes.syncToken || oldState.syncToken,
-    tasks: mergeTasks(oldState.tasks, changes.tasks),
-    projects: mergeProjects(oldState.projects, changes.projects),
+    tasks: mergeTasks(oldState.tasks, changes.tasks || []),
+    projects: mergeProjects(oldState.projects, changes.projects || []),
   }
 }
 
 export function mergeTasks(oldTasks: Task[], newTasks: Task[]): Task[] {
-  console.log("Changed tasks:", newTasks.map(t => t.content));
   const merged = oldTasks
     .filter(t => !newTasks.find(t2 => t2.id === t.id))
     .concat(newTasks)

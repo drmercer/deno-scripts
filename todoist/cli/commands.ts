@@ -1,6 +1,6 @@
 import password from "../../io/password.ts";
 import { readState, writeState } from "./store.ts";
-import { doSync, SyncState } from "../sync.ts";
+import { doSync, mergeState, SyncState } from "../sync.ts";
 import { Todoist } from "../api/api.ts";
 
 export function init() {
@@ -34,14 +34,31 @@ export async function sync() {
   console.log("State saved:", summarizeState(state));
 }
 
-export async function add([task]: string[]) {
+export async function add([taskText]: string[]) {
   const accessToken = localStorage.getItem("todoist:token");
   if (!accessToken) {
     console.error("Run td init first to set your Todoist access token");
     return;
   }
-  const result = await Todoist(accessToken).quickAdd(task);
-  console.log(result);
+
+  console.log(`Adding '${taskText}'...`);
+  const result = await Todoist(accessToken).quickAdd(taskText);
+  if (!result.success) {
+    console.error("Failed to create new task", result);
+    return;
+  }
+  const task = result.data;
+
+  const oldState = readState();
+  if (!oldState) {
+    return;
+  }
+
+  const state = mergeState(oldState, {
+    tasks: [task],
+  });
+
+  writeState(state);
 }
 
 export function status() {
