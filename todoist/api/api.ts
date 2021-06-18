@@ -34,16 +34,6 @@ export interface TodoistApi {
  */
 export function Todoist(token: string): TodoistApi {
 
-  function buildBody(params: BodyParams) {
-    const data = new URLSearchParams();
-    data.append("token", token);
-    if (params.resourceTypes) {
-      data.append("resource_types", JSON.stringify(params.resourceTypes));
-    }
-    data.append("sync_token", params.syncToken ?? "*");
-    return data;
-  }
-
   function wrapResult(data: any, status: number): SuccessResult<any>|ErrorResult {
     if ('error' in data) {
       return {
@@ -63,7 +53,12 @@ export function Todoist(token: string): TodoistApi {
    * See https://developer.todoist.com/sync/v8/#sync
    */
   async function sync(params: BodyParams): Promise<SuccessResult<SyncResponse> | ErrorResult> {
-    const body = buildBody(params);
+    const body = new URLSearchParams();
+    body.append("token", token);
+    if (params.resourceTypes) {
+      body.append("resource_types", JSON.stringify(params.resourceTypes));
+    }
+    body.append("sync_token", params.syncToken ?? "*");
     const response = await fetch(baseUrl + '/sync', {
       body,
       method: "POST",
