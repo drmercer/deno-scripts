@@ -21,7 +21,7 @@ function inbox() {
     .map(renderTask)
     .join('\n');
 
-  console.log(tasks)
+  console.log(`=== Inbox tasks: ===\n${tasks}\n===`);
 }
 
 function renderTask(t: Task) {
