@@ -1,4 +1,4 @@
-import { SyncState } from "./sync.ts";
+import { SyncState } from "../sync.ts";
 
 const StateKey = "todoist:state";
 

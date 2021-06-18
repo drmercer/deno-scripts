@@ -1,9 +1,8 @@
 import { endOfDay } from "../date/relative.ts";
 import { compareCreatedDate, compareDueDate, comparePriority } from "./comparators.ts";
-import { readState } from "./store.ts";
-import { SyncState } from "./sync.ts";
+import { readState } from "./cli/store.ts";
 
-import * as coreCommands from "./cli-commands.ts";
+import * as coreCommands from "./cli/commands.ts";
 
 const commands: Record<string, () => Promise<void>|void> = {
   ...coreCommands,

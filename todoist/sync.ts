@@ -1,5 +1,5 @@
-import { Project, Task } from './types.ts';
-import { SyncResult, Todoist } from './api.ts';
+import { Project, Task } from './api/types.ts';
+import { SyncResult, Todoist } from './api/api.ts';
 
 export interface SyncState {
   syncToken: string;

@@ -1,6 +1,6 @@
-import password from "../io/password.ts";
+import password from "../../io/password.ts";
 import { readState, writeState } from "./store.ts";
-import { doSync, SyncState } from "./sync.ts";
+import { doSync, SyncState } from "../sync.ts";
 
 export function init() {
   const accessToken = password("Enter your Todoist API token: ");

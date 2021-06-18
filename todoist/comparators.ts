@@ -1,4 +1,4 @@
-import { Task } from "./types.ts";
+import { Task } from "./api/types.ts";
 
 export function comparePriority(a: Task, b: Task): number {
   if (a.priority > b.priority) {
