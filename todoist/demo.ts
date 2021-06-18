@@ -4,20 +4,7 @@ import { compareCreatedDate, compareDueDate, comparePriority } from "./comparato
 
 import { readState } from "./cli/store.ts";
 import * as coreCommands from "./cli/commands.ts";
-
-const commands: Record<string, () => Promise<void>|void> = {
-  ...coreCommands,
-  inbox,
-}
-
-const command = Deno.args[0];
-
-if (command in commands) {
-  await commands[command]();
-} else {
-  console.error(`USAGE: demo <${Object.keys(commands).join('|')}>`);
-  Deno.exit(1);
-}
+import { commandHandler } from "../cli-utils/command.ts";
 
 function inbox() {
   const state = readState();
@@ -40,3 +27,16 @@ function inbox() {
 function renderTask(t: Task) {
   return `p${t.priority} ${t.content}${t.due ? ` (${t.due.date}, ${t.due.string})` : ""}`;
 }
+
+const handler = commandHandler({
+  commands: {
+    inbox,
+    ...coreCommands,
+  },
+  parentCommandName: 'td',
+  defaultCommand: 'inbox',
+});
+
+const success = await handler(Deno.args);
+
+Deno.exit(success ? 0 : 1);
