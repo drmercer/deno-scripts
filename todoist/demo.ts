@@ -1,5 +1,5 @@
 import { Task } from "./api/types.ts";
-import { isInProject, hasParentTask, isDueNow, hasDueDate } from './predicates.ts';
+import { isInProject, hasParentTask, isDueNow, hasDueDate, getDueDate } from './queries.ts';
 import { compareCreatedDate, compareDueDate, comparePriority } from "./comparators.ts";
 
 import { readState } from "./cli/store.ts";
@@ -25,7 +25,7 @@ function inbox() {
 }
 
 function renderTask(t: Task) {
-  return `p${t.priority} ${t.content}${t.due ? ` (${t.due.date}, ${t.due.string})` : ""}`;
+  return `p${t.priority} ${t.content}${t.due ? ` (${getDueDate(t)}, ${t.due.string})` : ""}`;
 }
 
 const handler = commandHandler({

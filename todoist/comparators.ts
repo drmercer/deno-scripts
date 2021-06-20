@@ -1,3 +1,4 @@
+import { getDueDate } from './queries.ts';
 import { Task } from "./api/types.ts";
 import { CompareFn, compareNumbers, map } from "https://danmercer.net/deno/common/sort/comparators.ts";
 
@@ -10,7 +11,7 @@ export const comparePriority: CompareFn<Task> = map(
  * Sorts by due date, puting tasks with no due date **last**.
  */
 export const compareDueDate: CompareFn<Task> = map(
-  t => t.due ? new Date(t.due.date).getTime() : Number.POSITIVE_INFINITY,
+  t => getDueDate(t)?.getTime() ?? Number.POSITIVE_INFINITY,
   compareNumbers,
 );
 
