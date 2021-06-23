@@ -1,11 +1,10 @@
-import password from "../../io/password.ts";
 import { readState, writeState } from "./store.ts";
 import { doSync, mergeState, SyncState } from "../sync.ts";
 import { Todoist } from "../api/api.ts";
 
 export function init() {
-  const accessToken = password("Enter your Todoist API token: ");
-  if (accessToken === undefined) {
+  const accessToken = prompt("Enter your Todoist API token:");
+  if (accessToken == null) {
     console.warn("Aborted. No access token entered.");
 
   } else if (accessToken === '') {
