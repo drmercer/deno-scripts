@@ -2,6 +2,7 @@ import { Project, Task } from './api/types.ts';
 import { SyncResponse, Todoist } from './api/api.ts';
 
 export interface SyncState {
+  syncTime: number;
   syncToken: string;
   tasks: Task[];
   projects: Project[];
@@ -19,8 +20,9 @@ export async function doSync(accessToken: string, oldState?: SyncState): Promise
   return oldState ? mergeState(oldState, changes) : changes;
 }
 
-export function resultToState(result: SyncResponse): SyncState {
+export function resultToState(result: SyncResponse, timestamp = new Date()): SyncState {
   return {
+    syncTime: timestamp.getTime(),
     syncToken: result.sync_token,
     tasks: result.items ?? [],
     projects: result.projects ?? [],
@@ -29,6 +31,7 @@ export function resultToState(result: SyncResponse): SyncState {
 
 export function mergeState(oldState: SyncState, changes: Partial<SyncState>): SyncState {
   return {
+    syncTime: changes.syncTime || oldState.syncTime,
     syncToken: changes.syncToken || oldState.syncToken,
     tasks: mergeTasks(oldState.tasks, changes.tasks || []),
     projects: mergeProjects(oldState.projects, changes.projects || []),

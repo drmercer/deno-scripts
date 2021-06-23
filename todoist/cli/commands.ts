@@ -76,6 +76,7 @@ export function clear() {
 // A little helper for summarizing the currently synced state
 function summarizeState(state: SyncState) {
   return {
+    lastUpdated: new Date(state.syncTime).toLocaleString(),
     tasks: state.tasks.length,
     projects: state.projects.length,
   };
