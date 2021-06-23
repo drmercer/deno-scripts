@@ -20,3 +20,5 @@ export const isDueNow = (t: Task) => (getDueDate(t) || Number.POSITIVE_INFINITY)
 export const hasParentTask = (t: Task) => !!t.parent_id;
 
 export const isInProject = (p: Project) => (t: Task) => t.project_id === p.id
+
+export const isCompleted = (t: Task) => !!t.checked;

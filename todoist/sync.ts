@@ -44,7 +44,7 @@ export function mergeTasks(oldTasks: Task[], newTasks: Task[]): Task[] {
 }
 
 function shouldKeepTask(t: Task): boolean {
-  return !t.is_deleted && !t.checked;
+  return !t.is_deleted;
 }
 
 export function mergeProjects(oldProjects: Project[], newProjects: Project[]): Project[] {

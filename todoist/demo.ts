@@ -1,5 +1,5 @@
 import { Task } from "./api/types.ts";
-import { isInProject, hasParentTask, isDueNow, hasDueDate, getDueDate } from './queries.ts';
+import { isInProject, hasParentTask, isDueNow, hasDueDate, getDueDate, isCompleted } from './queries.ts';
 import { compareCreatedDate, compareDueDate, comparePriority } from "./comparators.ts";
 
 import { readState } from "./cli/store.ts";
@@ -15,7 +15,7 @@ function inbox() {
 
   const tasks = state.tasks
     .filter(isInProject(inboxProject!))
-    .filter(t => !hasParentTask(t))
+    .filter(t => !hasParentTask(t) && !isCompleted(t))
     .filter(t => !hasDueDate(t) || isDueNow(t))
     .sort((a, b) => -comparePriority(a, b) || compareDueDate(a, b) || compareCreatedDate(a, b))
     .map(renderTask)
