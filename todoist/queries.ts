@@ -1,3 +1,4 @@
+import { endOfDay } from "../date/relative.ts";
 import { Project, Task } from "./api/types.ts";
 
 export const hasDueDate = (t: Task) => !!t.due;
@@ -15,7 +16,14 @@ export const getDueDate = (t: Task): Date | undefined => t.due ? dateStringToDat
 /**
  * Returns true if the due date is today (or earlier) and the due time is earlier than the current time.
  */
-export const isDueNow = (t: Task) => (getDueDate(t) || Number.POSITIVE_INFINITY) < new Date();
+export const isOverdue = (t: Task) => (getDueDate(t) || Number.POSITIVE_INFINITY) < new Date();
+
+/**
+ * @deprecated prefer isOverdue()
+ */
+export const isDueNow = isOverdue;
+
+export const isDueToday = (t: Task) => (getDueDate(t) || Number.POSITIVE_INFINITY) < endOfDay();
 
 export const hasParentTask = (t: Task) => !!t.parent_id;
 
