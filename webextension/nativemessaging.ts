@@ -6,12 +6,11 @@ import { writeAll } from 'https://deno.land/std@0.99.0/io/util.ts';
  */
 
 /**
- * Returns `true` if the program seems to be running as a WebExtension client (meaning stdin and stdout are TTYs,
- * and the first command line argument is the given extension origin).
+ * Returns `true` if the program seems to be running as a WebExtension client (currently
+ * just checks that stdin and stdout are not TTYs).
  */
-export function isRunningAsWebExtensionClient(extensionOrigin: string) {
-  return Deno.args[0] === extensionOrigin &&
-    !Deno.isatty(Deno.stdin.rid) &&
+export function isRunningAsWebExtensionClient() {
+  return !Deno.isatty(Deno.stdin.rid) &&
     !Deno.isatty(Deno.stdout.rid);
 }
 
@@ -34,12 +33,10 @@ export interface WebExtensionClient {
  * Builds a client for WebExtension Native Messaging.
  *
  * @see https://developer.chrome.com/docs/extensions/nativeMessaging/
- *
- * @param extensionOrigin The origin of the extension, such as `chrome-extension://<id>/`
  */
-export function buildWebExtensionClient(extensionOrigin: string): WebExtensionClient {
-  if (!isRunningAsWebExtensionClient(extensionOrigin)) {
-    throw new Error("Not running as a native messaging host for extension " + extensionOrigin);
+export function buildWebExtensionClient(): WebExtensionClient {
+  if (!isRunningAsWebExtensionClient()) {
+    throw new Error("Not running as a native messaging host");
   }
 
   // For safety. We can't use stdout for logging because it's used for messaging.
