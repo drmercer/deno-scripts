@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.99.0/http/server.ts";
 import { readAll } from 'https://deno.land/std@0.99.0/io/util.ts';
+import { green, bold, cyan, dim, white, bgGreen, yellow } from 'https://deno.land/std@0.99.0/fmt/colors.ts';
 import { commandHandler } from '../cli-utils/command.ts';
 import { buildWebExtensionClient } from "./nativemessaging.ts";
 
@@ -22,14 +23,19 @@ async function install([extensionOrigin, portStr = '8081']: string[]) {
   }
   const id = extensionOrigin.replace('chrome-extension', '').replace(/\W/g, '').substr(-10);
   const appname = 'deno_http_gateway_' + id;
-  console.log(`Installing for extension '${extensionOrigin}'. App name is '${appname}'`);
+  console.log(cyan(`Installing gateway for extension '${extensionOrigin}'. App name is '${appname}'`));
 
   const hostWithPort = hostname + ':' + port;
 
   const browserPath = 'BraveSoftware/Brave-Browser';
-  const manifestPath = `${Deno.env.get('HOME')}/.config/${browserPath}/NativeMessagingHosts/${appname}.json`;
+  const manifestPathTemplate = `<home>/.config/${browserPath}/NativeMessagingHosts/${appname}.json`
+  console.log(`${bold(yellow('Info:'))} Will write gateway manifest to '${manifestPathTemplate}'.`);
+  const manifestPath = manifestPathTemplate.replace('<home>', Deno.env.get('HOME') || '~');
+
+  const hostFilename = `_http_gateway_${id}.sh`;
+  console.log(`${bold(yellow('Info:'))} Will write gateway executable to '<deno binary dir>/${hostFilename}'.`);
   const denoExecPath = Deno.execPath();
-  const hostPath = `${denoExecPath.replace(/\w+$/, '')}_http_gateway_${id}.sh`;
+  const hostPath = `${denoExecPath.replace(/\w+$/, '')}${hostFilename}`;
 
   const manifest = {
     name: appname,
@@ -48,13 +54,29 @@ ${denoExecPath} run --allow-net=${hostWithPort} ${import.meta.url} serve ${port}
 `;
 
   await Deno.writeTextFile(hostPath, hostScript);
-  console.log(`Gateway executable written to '${hostPath}'`);
+  console.log(`${green(bold('Success:'))} gateway executable written to '${hostPath}'`);
   await Deno.chmod(hostPath, 0o755);
 
   await Deno.writeTextFile(manifestPath, JSON.stringify(manifest, null, 2));
-  console.log(`Manifest written to '${manifestPath}'`);
+  console.log(`${green(bold('Success:'))} gateway manifest written to '${manifestPath}'`);
 
-  console.log("Installed");
+  console.log(bgGreen(white(bold("Installed!"))));
+
+  console.log("To use this in your extension, do this:")
+  console.log(dim(white(`
+\`\`\`
+  const port = chrome.runtime.connectNative('${appname}');
+  port.onMessage.addListener(function(msg) {
+    console.log("Received", msg);
+    // TODO process msg
+    const result = { text: "Hello, world!" };
+    port.postMessage(result);
+  });
+  port.onDisconnect.addListener(function() {
+    console.log("Disconnected");
+  });
+\`\`\`
+`.trim())));
 }
 
 async function serveNativeMessaging([portStr]: string[]) {
