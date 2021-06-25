@@ -71,13 +71,13 @@ ${denoExecPath} run --allow-net=${hostWithPort} ${import.meta.url} serve ${port}
   console.log(dim(white(`
 \`\`\`
   const port = chrome.runtime.connectNative('${appname}');
-  port.onMessage.addListener(function(msg) {
+  port.onMessage.addListener((msg) => {
     console.log("Received", msg);
     // TODO process msg
     const result = { text: "Hello, world!" };
     port.postMessage(result);
   });
-  port.onDisconnect.addListener(function() {
+  port.onDisconnect.addListener(() => {
     console.log("Disconnected");
   });
 \`\`\`
