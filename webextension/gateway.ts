@@ -53,12 +53,12 @@ async function install([extensionOrigin, portStr = '8081']: string[]) {
 ${denoExecPath} run --allow-net=${hostWithPort} ${import.meta.url} serve ${port} 2>/tmp/${appname}.log
 `;
 
+  await Deno.writeTextFile(manifestPath, JSON.stringify(manifest, null, 2));
+  console.log(`${green(bold('Success:'))} gateway manifest written to '${manifestPath}'`);
+
   await Deno.writeTextFile(hostPath, hostScript);
   console.log(`${green(bold('Success:'))} gateway executable written to '${hostPath}'`);
   await Deno.chmod(hostPath, 0o755);
-
-  await Deno.writeTextFile(manifestPath, JSON.stringify(manifest, null, 2));
-  console.log(`${green(bold('Success:'))} gateway manifest written to '${manifestPath}'`);
 
   console.log(bgGreen(white(bold("Installed!"))));
 
