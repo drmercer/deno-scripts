@@ -15,15 +15,15 @@ const handler = commandHandler({
 
 await handler(Deno.args);
 
-async function install([extensionOrigin]: string[]) {
-  if (!extensionOrigin?.trim()) {
-    throw new Error("Usage: install <extension-origin>");
+async function install([extensionOrigin, portStr = '8081']: string[]) {
+  const port = Number(portStr);
+  if (!extensionOrigin?.trim() || !Number(portStr)) {
+    throw new Error("Usage: install <extension-origin> [port]");
   }
   const id = extensionOrigin.replace('chrome-extension', '').replace(/\W/g, '').substr(-10);
   const appname = 'deno_http_gateway_' + id;
   console.log(`Installing for extension '${extensionOrigin}'. App name is '${appname}'`);
 
-  const port = 8081;
   const hostWithPort = hostname + ':' + port;
 
   const browserPath = 'BraveSoftware/Brave-Browser';
