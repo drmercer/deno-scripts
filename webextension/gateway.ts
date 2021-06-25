@@ -23,7 +23,7 @@ function help() {
 
 async function install([extensionOrigin, portStr = '8081', browserPath = 'google-chrome']: string[]) {
   const port = Number(portStr);
-  if (!extensionOrigin?.trim() || !Number(portStr) || extensionOrigin === 'help') {
+  if (!extensionOrigin?.trim() || !port || extensionOrigin === 'help') {
     help();
     return;
   }
