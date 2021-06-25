@@ -16,10 +16,10 @@ const handler = commandHandler({
 
 await handler(Deno.args);
 
-async function install([extensionOrigin, portStr = '8081']: string[]) {
+async function install([extensionOrigin, portStr = '8081', browserPath = 'google-chrome']: string[]) {
   const port = Number(portStr);
   if (!extensionOrigin?.trim() || !Number(portStr)) {
-    throw new Error("Usage: install <extension-origin> [port]");
+    throw new Error("Usage: install <extension-origin> [port=8081] [browser=google-chrome]");
   }
   const id = extensionOrigin.replace('chrome-extension', '').replace(/\W/g, '').substr(-10);
   const appname = 'deno_http_gateway_' + id;
@@ -27,7 +27,6 @@ async function install([extensionOrigin, portStr = '8081']: string[]) {
 
   const hostWithPort = hostname + ':' + port;
 
-  const browserPath = 'BraveSoftware/Brave-Browser';
   const manifestPathTemplate = `<home>/.config/${browserPath}/NativeMessagingHosts/${appname}.json`
   console.log(`${bold(yellow('Info:'))} Will write gateway manifest to '${manifestPathTemplate}'.`);
   const manifestPath = manifestPathTemplate.replace('<home>', Deno.env.get('HOME') || '~');
