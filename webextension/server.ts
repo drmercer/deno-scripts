@@ -44,7 +44,7 @@ async function install([extensionOrigin, portStr = '8081']: string[]) {
   const hostScript = `
 #!/bin/sh
 
-${denoExecPath} run --allow-net=${hostWithPort} ${import.meta.url} serve ${port} 2>/tmp/deno-native-client.log
+${denoExecPath} run --allow-net=${hostWithPort} ${import.meta.url} serve ${port} 2>/tmp/${appname}.log
 `;
 
   await Deno.writeTextFile(hostPath, hostScript);

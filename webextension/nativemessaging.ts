@@ -52,7 +52,7 @@ export function buildWebExtensionClient(): WebExtensionClient {
       return null;
     }
     const messageSize = sizeBuf[0];
-    console.log("Message size", messageSize);
+    console.log("Message size: " + messageSize);
 
     const buf = new Uint8Array(messageSize);
     const read = await bufStdin.readFull(buf);
