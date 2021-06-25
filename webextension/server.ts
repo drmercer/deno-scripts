@@ -15,29 +15,25 @@ const handler = commandHandler({
 
 await handler(Deno.args);
 
-async function install([appname, extensionOrigin]: string[]) {
-  if (!appname?.trim() || !extensionOrigin?.trim()) {
-    throw new Error("Usage: install <app-name> <extension-origin>");
+async function install([extensionOrigin]: string[]) {
+  if (!extensionOrigin?.trim()) {
+    throw new Error("Usage: install <extension-origin>");
   }
-  appname = appname.toLowerCase().replace(/[^\w.]/g, '_');
-  console.log(`Installing for app '${appname}' and extension '${extensionOrigin}'`)
+  const id = extensionOrigin.replace('chrome-extension', '').replace(/\W/g, '').substr(-10);
+  const appname = 'deno_http_gateway_' + id;
+  console.log(`Installing for extension '${extensionOrigin}'. App name is '${appname}'`);
+
   const port = 8081;
   const hostWithPort = hostname + ':' + port;
 
-  const browserPath = 'BraveSoftware/Brave-Browser/';
-  const manifestDir = `${Deno.env.get('HOME')}/.config/${browserPath}NativeMessagingHosts/`;
-  const manifestPath = `${manifestDir}${appname}.json`;
+  const browserPath = 'BraveSoftware/Brave-Browser';
+  const manifestPath = `${Deno.env.get('HOME')}/.config/${browserPath}/NativeMessagingHosts/${appname}.json`;
   const denoExecPath = Deno.execPath();
-  const hostPath = `${denoExecPath}-native-messaging-host-${appname}.sh`;
-
-  const fi = await Deno.stat(manifestDir);
-  if (!fi.isDirectory) {
-    throw new Error(`'${manifestDir}' is not a directory`);
-  }
+  const hostPath = `${denoExecPath.replace(/\w+$/, '')}_http_gateway_${id}.sh`;
 
   const manifest = {
     name: appname,
-    description: "Deno Native Messaging Host",
+    description: "Deno Native Messaging Http Gateway",
     path: hostPath,
     type: "stdio",
     allowed_origins: [
@@ -52,7 +48,7 @@ ${denoExecPath} run --allow-net=${hostWithPort} ${import.meta.url} serve ${port}
 `;
 
   await Deno.writeTextFile(hostPath, hostScript);
-  console.log(`Host executable written to '${hostPath}'`);
+  console.log(`Gateway executable written to '${hostPath}'`);
   await Deno.chmod(hostPath, 0o755);
 
   await Deno.writeTextFile(manifestPath, JSON.stringify(manifest, null, 2));
