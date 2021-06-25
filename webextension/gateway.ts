@@ -8,6 +8,7 @@ const hostname = '127.0.0.1';
 
 const handler = commandHandler({
   commands: {
+    help,
     install,
     serve: serveNativeMessaging,
   },
@@ -16,10 +17,15 @@ const handler = commandHandler({
 
 await handler(Deno.args);
 
+function help() {
+  console.log("Usage: gateway.ts install <extension-origin> [port=8081] [browser=google-chrome]");
+}
+
 async function install([extensionOrigin, portStr = '8081', browserPath = 'google-chrome']: string[]) {
   const port = Number(portStr);
-  if (!extensionOrigin?.trim() || !Number(portStr)) {
-    throw new Error("Usage: install <extension-origin> [port=8081] [browser=google-chrome]");
+  if (!extensionOrigin?.trim() || !Number(portStr) || extensionOrigin === 'help') {
+    help();
+    return;
   }
   const id = extensionOrigin.replace('chrome-extension', '').replace(/\W/g, '').substr(-10);
   const appname = 'deno_http_gateway_' + id;

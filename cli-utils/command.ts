@@ -44,17 +44,15 @@ export function commandHandler({commands, defaultCommand, parentCommandName}: Co
         defaultCommand ? ']' : '>'
       }`;
 
-    if (cmd === 'help') {
-      console.log(usage());
-      return true;
-    }
-
     const commandFn = cmd ? commands[cmd] : undefined;
 
     if (commandFn) {
       await commandFn(commandArgs);
       return true;
 
+    } else if (cmd === 'help') {
+      console.log(usage());
+      return true;
     } else {
 
       console.warn(`Unrecognized command '${command}'`);
