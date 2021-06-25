@@ -1,0 +1,14 @@
+{
+  "name": "Deno Native Messaging Demo",
+  "version": "0.0.1",
+  "manifest_version": 2,
+  "description": "Receive messages from a Deno gateway",
+  "background": {
+    "scripts": [
+      "background.js"
+    ]
+  },
+  "permissions": [
+    "nativeMessaging"
+  ]
+}
