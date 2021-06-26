@@ -1,15 +1,21 @@
 import { Project, Task } from "./types.ts";
 
+/**
+ * https://developer.todoist.com/sync/v8/#read-resources
+ */
 export interface BodyParams {
   syncToken?: string;
   resourceTypes?: string[];
 }
 
+/**
+ * https://developer.todoist.com/sync/v8/#read-resources
+ */
 export interface SyncResponse {
   sync_token: string;
   items: Task[] | undefined;
   projects: Project[] | undefined;
-  // TODO add other resource types
+  // TODO(someday) add other resource types
 }
 
 export interface SuccessResult<T> {
