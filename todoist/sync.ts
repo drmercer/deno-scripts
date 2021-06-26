@@ -38,10 +38,14 @@ export function mergeState(oldState: SyncState, changes: Partial<SyncState>): Sy
   }
 }
 
+function mergeByKey<T>(a: T[], b: T[], key: keyof T): T[] {
+  return a
+    .filter(ae => !b.find(be => ae[key] === be[key]))
+    .concat(b);
+}
+
 export function mergeTasks(oldTasks: Task[], newTasks: Task[]): Task[] {
-  const merged = oldTasks
-    .filter(t => !newTasks.find(t2 => t2.id === t.id))
-    .concat(newTasks)
+  const merged = mergeByKey(oldTasks, newTasks, 'id')
     .filter(shouldKeepTask)
   return merged;
 }
@@ -51,6 +55,5 @@ function shouldKeepTask(t: Task): boolean {
 }
 
 export function mergeProjects(oldProjects: Project[], newProjects: Project[]): Project[] {
-  // TODO merge projects
-  return oldProjects.concat(newProjects);
+  return mergeByKey(oldProjects, newProjects, 'id');
 }
