@@ -25,7 +25,7 @@ function inbox() {
 }
 
 function renderTask(t: Task) {
-  return `p${t.priority} ${t.content}${t.due ? ` (${getDueDate(t)}, ${t.due.string})` : ""}`;
+  return `p${5 - t.priority} ${t.content}${t.due ? ` (${getDueDate(t)}, ${t.due.string})` : ""}`;
 }
 
 const handler = commandHandler({
