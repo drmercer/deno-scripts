@@ -1,9 +1,9 @@
-import { getDueDate } from './queries.ts';
+import { getDueDate, getProjectOrder, getUserPriority } from './queries.ts';
 import { Task } from "./api/types.ts";
 import { CompareFn, compareNumbers, map } from "https://danmercer.net/deno/common/sort/comparators.ts";
 
-export const comparePriority: CompareFn<Task> = map(
-  t => t.priority,
+export const compareUserPriority: CompareFn<Task> = map(
+  getUserPriority,
   compareNumbers,
 );
 
@@ -26,6 +26,6 @@ export const compareCreatedDate: CompareFn<Task> = map(
 );
 
 export const compareProjectOrder: CompareFn<Task> = map(
-  t => -t.child_order,
+  getProjectOrder,
   compareNumbers,
 );

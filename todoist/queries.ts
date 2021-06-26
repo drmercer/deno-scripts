@@ -29,4 +29,8 @@ export const hasParentTask = (t: Task) => !!t.parent_id;
 
 export const isInProject = (p: Project) => (t: Task) => t.project_id === p.id
 
+export const getProjectOrder = (t: Task) => t.child_order;
+
 export const isCompleted = (t: Task) => !!t.checked;
+
+export const getUserPriority = (t: Task) => 5 - t.priority;

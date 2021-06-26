@@ -1,7 +1,7 @@
 import { Task } from "./api/types.ts";
 import { mergeState, SyncState } from './sync.ts';
-import { isInProject, hasParentTask, hasDueDate, getDueDate, isCompleted, isDueToday } from './queries.ts';
-import { compareCreatedDate, compareDueDate, comparePriority, compareProjectOrder } from "./comparators.ts";
+import { isInProject, hasParentTask, hasDueDate, getDueDate, isCompleted, isDueToday, getUserPriority } from './queries.ts';
+import { compareCreatedDate, compareDueDate, compareUserPriority, compareProjectOrder } from "./comparators.ts";
 
 import { readState, readToken, writeState } from "./cli/store.ts";
 import * as coreCommands from "./cli/commands.ts";
@@ -67,11 +67,11 @@ function inboxTasks(state: SyncState): Task[] {
     .filter(isInProject(inboxProject!))
     .filter(t => !hasParentTask(t) && !isCompleted(t))
     .filter(t => !hasDueDate(t) || isDueToday(t))
-    .sort((a, b) => -comparePriority(a, b) || compareDueDate(a, b) || compareProjectOrder(a, b))
+    .sort((a, b) => compareUserPriority(a, b) || compareDueDate(a, b) || compareProjectOrder(a, b))
 }
 
 function renderTask(t: Task) {
-  return `p${5 - t.priority} ${t.content}${t.due ? ` (${getDueDate(t)}, ${t.due.string})` : ""}`;
+  return `p${getUserPriority(t)} ${t.content}${t.due ? ` (${getDueDate(t)}, ${t.due.string})` : ""}`;
 }
 
 const handler = commandHandler({
