@@ -24,3 +24,8 @@ export const compareCreatedDate: CompareFn<Task> = map(
   t => t.date_added,
   compareStringDates,
 );
+
+export const compareProjectOrder: CompareFn<Task> = map(
+  t => -t.child_order,
+  compareNumbers,
+);

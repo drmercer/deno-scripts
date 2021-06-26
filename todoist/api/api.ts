@@ -22,11 +22,30 @@ export interface ErrorResult {
   error_code: number;
 }
 
+export type Result<T> = SuccessResult<T> | ErrorResult;
+
+function wrapResult(data: any, status: number): Result<any> {
+  if ('error' in data) {
+    return {
+      success: false,
+      error: data.error || '[no error in response]',
+      error_code: data.error_code || status,
+      ...data,
+    };
+  } else {
+    return {
+      success: true,
+      data,
+    };
+  }
+}
+
 const baseUrl = "https://api.todoist.com/sync/v8";
 
 export interface TodoistApi {
-  sync(params: BodyParams): Promise<SuccessResult<SyncResponse> | ErrorResult>;
-  quickAdd(text: string, note?: string, autoReminder?: boolean, reminder?: string): Promise<SuccessResult<Task> | ErrorResult>;
+  sync(params: BodyParams): Promise<Result<SyncResponse>>;
+  quickAdd(text: string, note?: string, autoReminder?: boolean, reminder?: string): Promise<Result<Task>>;
+  complete(taskId: number): Promise<Result<unknown>>;
 }
 
 /**
@@ -34,25 +53,10 @@ export interface TodoistApi {
  */
 export function Todoist(token: string): TodoistApi {
 
-  function wrapResult(data: any, status: number): SuccessResult<any>|ErrorResult {
-    if ('error' in data) {
-      return {
-        success: false,
-        error: data.error || '[no error in response]',
-        error_code: data.error_code || status,
-      };
-    } else {
-      return {
-        success: true,
-        data,
-      };
-    }
-  }
-
   /**
    * See https://developer.todoist.com/sync/v8/#sync
    */
-  async function sync(params: BodyParams): Promise<SuccessResult<SyncResponse> | ErrorResult> {
+  async function sync(params: BodyParams): Promise<Result<SyncResponse>> {
     const body = new URLSearchParams();
     body.append("token", token);
     if (params.resourceTypes) {
@@ -73,7 +77,7 @@ export function Todoist(token: string): TodoistApi {
   /**
    * See https://developer.todoist.com/sync/v8/#quick-add-an-item
    */
-  async function quickAdd(text: string, note = '', autoReminder = true, reminder = ''): Promise<SuccessResult<Task> | ErrorResult> {
+  async function quickAdd(text: string, note = '', autoReminder = true, reminder = ''): Promise<Result<Task>> {
     const body = new URLSearchParams({
       text,
       "auto_reminder": String(autoReminder),
@@ -96,8 +100,35 @@ export function Todoist(token: string): TodoistApi {
     return wrapResult(data, response.status);
   }
 
+  /**
+   * https://developer.todoist.com/sync/v8/#close-item
+   */
+  async function complete(taskId: number): Promise<Result<unknown>> {
+    const command = {
+      type: 'item_close',
+      uuid: crypto.randomUUID(),
+      args: {
+        id: taskId,
+      },
+    };
+    const body = new URLSearchParams({
+      commands: JSON.stringify([command])
+    });
+    const response = await fetch(baseUrl + '/sync', {
+      body,
+      method: "POST",
+      headers: {
+        "Accept": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
+    });
+    const data = await response.json();
+    return wrapResult(data, response.status);
+  }
+
   return {
     sync,
     quickAdd,
+    complete,
   };
 }
