@@ -22,3 +22,17 @@ export function writeState(state: SyncState | undefined): void {
     localStorage.removeItem(StateKey);
   }
 }
+
+const TokenKey = "todoist:token";
+
+export function readToken(): string|undefined {
+  return localStorage.getItem("todoist:token") || undefined;
+}
+
+export function writeToken(token: string|undefined): void {
+  if (token) {
+    localStorage.setItem(TokenKey, token);
+  } else {
+    localStorage.removeItem(TokenKey);
+  }
+}

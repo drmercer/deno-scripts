@@ -1,4 +1,4 @@
-import { readState, writeState } from "./store.ts";
+import { readState, writeState, readToken, writeToken } from "./store.ts";
 import { doSync, mergeState, SyncState } from "../sync.ts";
 import { Todoist } from "../api/api.ts";
 
@@ -8,17 +8,17 @@ export function init() {
     console.warn("Aborted. No access token entered.");
 
   } else if (accessToken === '') {
-    localStorage.removeItem("todoist:token");
+    writeToken(undefined);
     console.error("Access token cleared under origin " + window.location.origin);
 
   } else {
-    localStorage.setItem("todoist:token", accessToken);
+    writeToken(accessToken);
     console.log("Access token saved under origin " + window.location.origin);
   }
 }
 
 export async function sync() {
-  const accessToken = localStorage.getItem("todoist:token");
+  const accessToken = readToken();
   if (!accessToken) {
     console.error("Run td init first to set your Todoist access token");
     return;
@@ -34,7 +34,7 @@ export async function sync() {
 }
 
 export async function add([taskText]: string[]) {
-  const accessToken = localStorage.getItem("todoist:token");
+  const accessToken = readToken();
   if (!accessToken) {
     console.error("Run td init first to set your Todoist access token");
     return;
