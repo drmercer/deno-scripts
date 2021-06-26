@@ -7,6 +7,7 @@ import { readState, readToken, writeState } from "./cli/store.ts";
 import * as coreCommands from "./cli/commands.ts";
 import { commandHandler } from "../cli-utils/command.ts";
 import { Todoist } from "./api/api.ts";
+import { dateToDateString } from "./util/date.ts";
 
 function inbox() {
   const state = readState();
@@ -49,8 +50,7 @@ async function completeTopTask() {
     tasks: [{
       ...task,
       checked: 1,
-      // TODO this date string is in UTC timezone, is that a problem?
-      date_completed: new Date().toISOString(),
+      date_completed: dateToDateString(new Date()),
     }],
   });
 
