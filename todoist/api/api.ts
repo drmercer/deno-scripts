@@ -48,10 +48,21 @@ function wrapResult(data: any, status: number): Result<any> {
 
 const baseUrl = "https://api.todoist.com/sync/v8";
 
+/**
+ * https://developer.todoist.com/sync/v8/#write-resources
+ */
+export interface SyncCommand {
+  type: string;
+  uuid: string;
+  args: Record<string, unknown>;
+  temp_id?: string;
+}
+
 export interface TodoistApi {
   sync(params: BodyParams): Promise<Result<SyncResponse>>;
   quickAdd(text: string, note?: string, autoReminder?: boolean, reminder?: string): Promise<Result<Task>>;
   complete(taskId: number): Promise<Result<unknown>>;
+  doCommands(commands: SyncCommand[]): Promise<Result<unknown>>;
 }
 
 /**
@@ -117,8 +128,12 @@ export function Todoist(token: string): TodoistApi {
         id: taskId,
       },
     };
+    return doCommands([command]);
+  }
+
+  async function doCommands(commands: SyncCommand[]): Promise<Result<any>> {
     const body = new URLSearchParams({
-      commands: JSON.stringify([command])
+      commands: JSON.stringify(commands)
     });
     const response = await fetch(baseUrl + '/sync', {
       body,
@@ -136,5 +151,6 @@ export function Todoist(token: string): TodoistApi {
     sync,
     quickAdd,
     complete,
+    doCommands,
   };
 }
