@@ -59,6 +59,41 @@ async function completeTopTask() {
   console.log(`Successfully completed task.`);
 }
 
+async function doTomorrow([text]: string[]) {
+  const accessToken = readToken();
+  if (!accessToken) {
+    console.error("Run td init first to set your Todoist access token");
+    return;
+  }
+
+  const state = readState();
+  if (!state) {
+    console.error("No tasks synced. Run `td sync` first to download your tasks.");
+    return;
+  }
+
+  const task = state.tasks.find(t => t.content?.includes(text));
+  if (!task) {
+    console.warn("No matching task found in inbox");
+    return;
+  }
+
+  if (!confirm(`Schedule '${task.content} (${getUserPriority(task)}, due ${task.due?.string ?? 'never'})' for tomorrow?`)) {
+    console.log(`Canceled.`);
+    return;
+  }
+
+  console.log(`Scheduling task '${task.content}'...`);
+  const result = await Todoist(accessToken).schedule(task.id, 'tomorrow');
+  if (!result.success) {
+    console.error("Failed to schedule task", result);
+    return;
+  }
+
+  console.log(`Successfully scheduled task.`);
+  await coreCommands.sync();
+}
+
 function inboxTasks(state: SyncState): Task[] {
   // NOTE not sure if this properly filters out team inboxes
   const inboxProject = state.projects.find(p => p.inbox_project === true);
@@ -78,6 +113,7 @@ const handler = commandHandler({
   commands: {
     inbox,
     completeTopTask,
+    doTomorrow,
     ...coreCommands,
   },
   parentCommandName: 'td',

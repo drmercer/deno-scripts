@@ -63,6 +63,7 @@ export interface TodoistApi {
   quickAdd(text: string, note?: string, autoReminder?: boolean, reminder?: string): Promise<Result<Task>>;
   complete(taskId: number): Promise<Result<unknown>>;
   doCommands(commands: SyncCommand[]): Promise<Result<unknown>>;
+  schedule(taskId: number, due: string | null): Promise<Result<unknown>>;
 }
 
 /**
@@ -131,6 +132,21 @@ export function Todoist(token: string): TodoistApi {
     return doCommands([command]);
   }
 
+  /**
+   * https://developer.todoist.com/sync/v8/#update-an-item
+   */
+  async function schedule(taskId: number, due: string|null): Promise<Result<unknown>> {
+    const command = {
+      type: 'item_update',
+      uuid: crypto.randomUUID(),
+      args: {
+        id: taskId,
+        due: due ? {string: due} : null,
+      },
+    };
+    return doCommands([command]);
+  }
+
   async function doCommands(commands: SyncCommand[]): Promise<Result<any>> {
     const body = new URLSearchParams({
       commands: JSON.stringify(commands)
@@ -152,5 +168,6 @@ export function Todoist(token: string): TodoistApi {
     quickAdd,
     complete,
     doCommands,
+    schedule,
   };
 }
